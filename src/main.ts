@@ -1,36 +1,60 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ClassSerializerInterceptor } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import {
+  ClassSerializerInterceptor,
+  LoggerService,
+  ValidationPipe,
+} from '@nestjs/common';
+import { SwaggerModule } from '@nestjs/swagger';
+import { appConfig, swaggerConfig, validationConfig } from './config';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-  const config = new DocumentBuilder()
-    .setTitle('Inventory Management Service API')
-    .setDescription('Inventory Management Service API')
-    .setVersion('1.0')
-    .setContact(
-      'Oluwaseyi Oke',
-      'https://iamarvy.netlify.app',
-      'iamarvy.tech@gmail.com',
-    )
-    .setVersion('1.0')
-    .addApiKey(
-      {
-        type: 'apiKey',
-        name: 'x-tenant-id',
-        in: 'header',
-        description: 'Tenant identifier header',
-      },
-      'tenant-key',
-    )
-    .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory, {
-    jsonDocumentUrl: 'swagger/json',
-  });
+  const { name, isDev, env, port, url, prefix } = appConfig();
 
-  await app.listen(process.env.PORT ?? 3000);
+  const app = await NestFactory.create(AppModule);
+
+  // Global Interceptors
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+
+  // Swagger Docs
+  SwaggerModule.setup(
+    swaggerConfig().path,
+    app,
+    SwaggerModule.createDocument(app, swaggerConfig().document),
+    swaggerConfig().options,
+  );
+
+  // CORS
+  app.enableCors();
+
+  // Global Prefix
+  app.setGlobalPrefix(prefix, { exclude: [swaggerConfig().path] });
+
+  // Global Pipes
+  app.useGlobalPipes(new ValidationPipe(validationConfig().options));
+
+  // Logger
+  app.useLogger(app.get<LoggerService>(WINSTON_MODULE_NEST_PROVIDER));
+
+  if (isDev) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-call
+    app.use(require('morgan')('dev'));
+  }
+
+  await app.listen(port);
+
+  const logger = app.get<LoggerService>(WINSTON_MODULE_NEST_PROVIDER);
+  logger.log(
+    `
+      ------------
+      Internal Application Started!
+      Environment: ${env}
+      API:${url}
+      API Docs: ${url}/docs
+      ------------
+  `,
+    ` ${name} | ${env}`,
+  );
 }
 bootstrap();
