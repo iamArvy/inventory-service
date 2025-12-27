@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   Param,
   Patch,
   Post,
@@ -11,111 +12,58 @@ import {
 import { InventoryService } from '../service';
 import {
   CreateInventoryDto,
-  InventoryDto,
   InventoryQueryDto,
-  PaginatedInventoryDto,
   PatchInventoryDto,
   UpdateInventoryDto,
 } from '../dto';
+import { ApiSecurity } from '@nestjs/swagger';
+import { INVENTORY_CONTROLLER, INVENTORY_ENDPOINTS } from '../constants';
 import {
-  ApiBadRequestResponse,
-  ApiBody,
-  ApiCreatedResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiSecurity,
-} from '@nestjs/swagger';
+  CreateInventoryDocs,
+  GetInventoryDocs,
+  ListInventoryDocs,
+  PatchInventoryDocs,
+  UpdateInventoryDocs,
+} from '../docs';
 
 @ApiSecurity('tenant-key')
-@Controller('warehouses/:warehouseId/inventory')
+@Controller(INVENTORY_CONTROLLER.basePath)
 export class InventoryController {
   constructor(private readonly service: InventoryService) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create a new inventory record for a product' })
-  @ApiParam({ name: 'warehouseId', type: String, description: 'Warehouse ID' })
-  @ApiBody({ type: CreateInventoryDto })
-  @ApiCreatedResponse({
-    description: 'Inventory created successfully',
-    type: InventoryDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'Invalid input or missing required fields',
-  })
-  create(
-    @Param('warehouseId') warehouseId: string,
-    @Body() data: CreateInventoryDto,
-  ) {
-    return this.service.create(warehouseId, data);
+  @CreateInventoryDocs()
+  @Post(INVENTORY_ENDPOINTS.CREATE.path)
+  create(@Body() data: CreateInventoryDto) {
+    return this.service.create(data);
   }
 
-  @Get(':productId')
-  @ApiOperation({ summary: 'Get inventory details for a specific product' })
-  @ApiParam({ name: 'warehouseId', type: String })
-  @ApiParam({ name: 'productId', type: String })
-  @ApiOkResponse({
-    description: 'Inventory record retrieved',
-    type: InventoryDto,
-  })
-  @ApiNotFoundResponse({ description: 'Inventory not found' })
-  get(
-    @Param('warehouseId') warehouseId: string,
-    @Param('productId') productId: string,
-  ) {
-    return this.service.get(warehouseId, productId);
+  @GetInventoryDocs()
+  @Get(INVENTORY_ENDPOINTS.GET.path)
+  get(@Param('productId') productId: string) {
+    return this.service.get(productId);
   }
 
-  @Get()
-  @ApiOperation({ summary: 'List inventory items in a warehouse' })
-  @ApiParam({ name: 'warehouseId', type: String })
-  @ApiQuery({ type: InventoryQueryDto })
-  @ApiOkResponse({
-    description: 'List of inventory records',
-    type: PaginatedInventoryDto,
-  })
-  list(
-    @Param('warehouseId') warehouseId: string,
-    @Query() query: InventoryQueryDto,
-  ) {
-    return this.service.list(warehouseId, query);
+  @ListInventoryDocs()
+  @Get(INVENTORY_ENDPOINTS.LIST.path)
+  list(@Query() query: InventoryQueryDto) {
+    return this.service.list(query);
   }
 
-  @Put(':productId')
-  @ApiOperation({ summary: 'Update an inventory record (replace)' })
-  @ApiParam({ name: 'warehouseId', type: String })
-  @ApiParam({ name: 'productId', type: String })
-  @ApiBody({ type: UpdateInventoryDto })
-  @ApiOkResponse({ description: 'Inventory updated successfully' })
-  @ApiNotFoundResponse({ description: 'Inventory not found' })
-  @ApiBadRequestResponse({
-    description: 'Invalid input or missing required fields',
-  })
+  @UpdateInventoryDocs()
+  @Put(INVENTORY_ENDPOINTS.UPDATE.path)
   update(
-    @Param('warehouseId') warehouseId: string,
     @Param('productId') productId: string,
     @Body() data: UpdateInventoryDto,
   ) {
-    return this.service.update(warehouseId, productId, data);
+    return this.service.update(productId, data);
   }
 
-  @Patch(':productId')
-  @ApiOperation({ summary: 'Partially update an inventory record' })
-  @ApiParam({ name: 'warehouseId', type: String })
-  @ApiParam({ name: 'productId', type: String })
-  @ApiBody({ type: UpdateInventoryDto })
-  @ApiOkResponse({ description: 'Inventory updated successfully' })
-  @ApiNotFoundResponse({ description: 'Inventory not found' })
-  @ApiBadRequestResponse({
-    description: 'Invalid input or missing required fields',
-  })
+  @PatchInventoryDocs()
+  @Patch(INVENTORY_ENDPOINTS.PATCH.path)
   patch(
-    @Param('warehouseId') warehouseId: string,
     @Param('productId') productId: string,
     @Body() data: PatchInventoryDto,
   ) {
-    return this.service.update(warehouseId, productId, data);
+    return this.service.update(productId, data);
   }
 }

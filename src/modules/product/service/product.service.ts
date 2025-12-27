@@ -44,9 +44,14 @@ export class ProductService {
   async get(id: string) {
     const product = await this.prisma.instance.product.findUnique({
       where: { id },
+      include: { WarehouseInventory: { select: { stock: true } } },
     });
     if (!product) throw new NotFoundException('Product not found');
-    return product;
+    const stock = product.WarehouseInventory.reduce(
+      (total, inv) => total + inv.stock,
+      0,
+    );
+    return { ...product, stock, WarehouseInventory: undefined };
   }
 
   async list(query: ProductQueryDto) {

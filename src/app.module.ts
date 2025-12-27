@@ -10,7 +10,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { config, validationSchema, WinstonConfig } from './config';
+import { clsConfig, config, validationSchema, WinstonConfig } from './config';
 import { LoggingInterceptor } from './common/interceptors';
 import { WinstonModule } from 'nest-winston';
 
@@ -28,15 +28,7 @@ import { WinstonModule } from 'nest-winston';
         return winstonConfig;
       },
     }),
-    ClsModule.forRoot({
-      middleware: {
-        mount: true,
-        setup: (cls, req: Request) => {
-          cls.set('tenantId', req.headers['x-tenant-id']);
-        },
-      },
-      global: true,
-    }),
+    ClsModule.forRoot(clsConfig),
     PrismaModule,
     EventEmitterModule.forRoot(),
     ProductModule,
