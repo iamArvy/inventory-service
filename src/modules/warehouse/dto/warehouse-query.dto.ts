@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { WarehouseStatus } from '@prisma/client';
 import { IsOptional, IsString, IsEnum } from 'class-validator';
 import { PaginationQueryDto } from 'src/common/dto';
+import { WarehouseStatus } from 'src/generated/prisma/enums';
 
 export enum WarehouseSortBy {
   NAME = 'name',

@@ -1,7 +1,7 @@
 import { registerAs } from '@nestjs/config';
 import { DocumentBuilder } from '@nestjs/swagger';
 import { appConfig } from './app.config';
-import { TENANT_HEADER } from 'src/constants';
+import { TENANT_HEADER, WAREHOUSE_HEADER } from 'src/constants';
 
 const { name, version } = appConfig();
 
@@ -15,11 +15,11 @@ export const swaggerConfig = registerAs('swagger', () => ({
       'https://iamarvy.netlify.app',
       'iamarvy.tech@gmail.com',
     )
-    .addBearerAuth({
-      type: 'http',
-      scheme: 'bearer',
-      bearerFormat: 'JWT',
-    })
+    // .addBearerAuth({
+    //   type: 'http',
+    //   scheme: 'bearer',
+    //   bearerFormat: 'JWT',
+    // })
     .addApiKey(
       {
         type: 'apiKey',
@@ -27,6 +27,14 @@ export const swaggerConfig = registerAs('swagger', () => ({
         in: 'header',
       },
       TENANT_HEADER.name,
+    )
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: WAREHOUSE_HEADER.key,
+        in: 'header',
+      },
+      WAREHOUSE_HEADER.name,
     )
     .build(),
   path: 'docs',

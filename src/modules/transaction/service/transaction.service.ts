@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateTransactionDto, TransactionQueryDto } from '../dto';
-import { PrismaService } from 'src/prisma';
+import { PrismaService } from 'src/db';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EventKeys } from 'src/common/event-keys';
 import { TransactionCreatedEvent } from 'src/events';
@@ -20,19 +20,19 @@ export class TransactionService {
   private readonly logger = new Logger(TransactionService.name);
 
   async create(data: CreateTransactionDto) {
-    const { warehouseId, productId } = data;
+    const { warehouse_id, product_id } = data;
     const warehouse = await this.prisma.instance.warehouse.findUnique({
-      where: { id: warehouseId },
+      where: { id: warehouse_id },
     });
     if (!warehouse) throw new BadRequestException('Warehouse does not exist');
 
     const product = await this.prisma.instance.product.findUnique({
-      where: { id: productId },
+      where: { id: product_id },
     });
     if (!product) throw new BadRequestException('Product not found');
 
     const inventory = await this.prisma.instance.warehouseInventory.findUnique({
-      where: { warehouseId_productId: { warehouseId, productId } },
+      where: { warehouse_id_product_id: { warehouse_id, product_id } },
     });
 
     if (!inventory)
@@ -48,14 +48,14 @@ export class TransactionService {
       data,
     });
     this.logger.log(
-      `Created ${transaction.type} transaction for product ${productId} in warehouse ${warehouseId} `,
+      `Created ${transaction.type} transaction for product ${product_id} in warehouse ${warehouse_id} `,
     );
     this.eventEmitter.emit(
       EventKeys.TRANSACTION_CREATED,
       new TransactionCreatedEvent(
         transaction.id,
-        warehouseId,
-        productId,
+        warehouse_id,
+        product_id,
         transaction.quantity,
         transaction.type,
       ),
@@ -72,21 +72,20 @@ export class TransactionService {
   }
 
   async list(query: TransactionQueryDto) {
-    const { sortBy, order, page, limit, warehouseId, productId, type } = query;
-    const orderBy = { [sortBy ?? 'createdAt']: order };
+    const { sort_by, order, page, limit, warehouse_id, product_id, type } =
+      query;
+    const orderBy = { [sort_by ?? 'createdAt']: order };
 
-    const result = await this.prisma.instance.xprisma.stockTransaction.paginate(
-      {
-        where: {
-          warehouseId,
-          productId,
-          type,
-        },
-        orderBy,
-        page: page ?? 1,
-        limit: limit ?? 20,
+    const result = await this.prisma.instance.stockTransaction.findMany({
+      where: {
+        warehouse_id,
+        product_id,
+        type,
       },
-    );
+      orderBy,
+      skip: page ?? 1,
+      take: limit ?? 20,
+    });
 
     return result;
   }

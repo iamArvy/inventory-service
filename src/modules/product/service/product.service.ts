@@ -6,9 +6,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateProductDto, PatchProductDto, ProductQueryDto } from '../dto';
-import { PrismaService } from 'src/prisma';
-import { ProductStatus } from '@prisma/client';
+import { PrismaService } from 'src/db';
 import { ClsService } from 'nestjs-cls';
+import { ProductStatus } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class ProductService {
@@ -58,15 +58,16 @@ export class ProductService {
     const { sortBy, order, page, limit, name, sku } = query;
     const orderBy = { [sortBy ?? 'createdAt']: order };
 
-    const result = await this.prisma.instance.xprisma.product.paginate({
+    const result = await this.prisma.instance.product.findMany({
       where: {
         name,
         sku,
       },
       orderBy,
-      page: page ?? 1,
-      limit: limit ?? 20,
+      skip: page ?? 1,
+      take: limit ?? 20,
     });
+    console.log(result);
 
     return result;
   }

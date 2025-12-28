@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { TransactionType } from '@prisma/client';
 import { IsOptional, IsEnum, IsUUID } from 'class-validator';
 import { PaginationQueryDto } from 'src/common/dto';
+import { TransactionType } from 'src/generated/prisma/enums';
 
 export enum TransactionSortBy {
   QUANTITY = 'quantity',
@@ -15,17 +15,17 @@ export class TransactionQueryDto extends PaginationQueryDto {
   })
   @IsOptional()
   @IsEnum(TransactionSortBy)
-  sortBy?: TransactionSortBy;
+  sort_by?: TransactionSortBy;
 
   @ApiPropertyOptional({ description: 'id of the warehouse' })
   @IsOptional()
   @IsUUID()
-  warehouseId?: string;
+  warehouse_id?: string;
 
   @ApiPropertyOptional({ description: 'id of the product' })
   @IsOptional()
   @IsUUID()
-  productId?: string;
+  product_id?: string;
 
   @IsEnum(TransactionType, {
     message: 'Transaction type must be either active or inactive',

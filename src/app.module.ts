@@ -1,6 +1,6 @@
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { PrismaModule } from './prisma/prisma.module';
+import { DbModule } from './db/db.module';
 import { ClsModule } from 'nestjs-cls';
 import { ProductModule } from './modules/product/product.module';
 import { WarehouseModule } from './modules/warehouse/warehouse.module';
@@ -29,7 +29,7 @@ import { WinstonModule } from 'nest-winston';
       },
     }),
     ClsModule.forRoot(clsConfig),
-    PrismaModule,
+    DbModule,
     EventEmitterModule.forRoot(),
     ProductModule,
     WarehouseModule,

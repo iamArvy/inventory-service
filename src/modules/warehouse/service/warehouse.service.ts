@@ -10,7 +10,7 @@ import {
   PatchWarehouseDto,
   WarehouseQueryDto,
 } from '../dto';
-import { PrismaService } from 'src/prisma';
+import { PrismaService } from 'src/db';
 import { ClsService } from 'nestjs-cls';
 
 @Injectable()
@@ -56,14 +56,14 @@ export class WarehouseService {
     const { sortBy, order, page, limit, name, status } = query;
     const orderBy = { [sortBy ?? 'createdAt']: order };
 
-    const result = await this.prisma.instance.xprisma.warehouse.paginate({
+    const result = await this.prisma.instance.warehouse.findMany({
       where: {
         name,
         status,
       },
       orderBy,
-      page: page ?? 1,
-      limit: limit ?? 20,
+      skip: page ?? 1,
+      take: limit ?? 20,
     });
 
     return result;
@@ -94,11 +94,11 @@ export class WarehouseService {
       where: { id },
     });
     if (!warehouse) throw new NotFoundException('Warehouse not found');
-    if (warehouse.deletedAt)
+    if (warehouse.deleted_at)
       throw new BadRequestException('Warehouse already deleted');
     await this.prisma.warehouse.update({
       where: { id: warehouse.id },
-      data: { deletedAt: new Date() },
+      data: { deleted_at: new Date() },
     });
     this.logger.log(`Warehouse with id ${id} deleted`);
     return { success: true };

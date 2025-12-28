@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { WarehouseStatus } from '@prisma/client';
 import { Expose } from 'class-transformer';
+import { WarehouseStatus } from 'src/generated/prisma/enums';
 
 export class WarehouseDto {
   @Expose()
@@ -25,13 +25,13 @@ export class WarehouseDto {
 
   @Expose()
   @ApiProperty()
-  createdAt: string;
+  created_at: string;
 
   @Expose()
   @ApiProperty()
-  updatedAt: string;
+  updated_at: string;
 
   @Expose()
   @ApiProperty()
-  deletedAt: string | null;
+  deleted_at: string | null;
 }

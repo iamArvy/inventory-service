@@ -5,12 +5,14 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+  engineType   = "adapter-pg"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Product {
@@ -19,8 +21,9 @@ model Product {
   name               String
   description        String
   sku                String
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
+  created_at         DateTime             @default(now())
+  updated_at         DateTime             @updatedAt
+  deleted_at         DateTime?
   status             ProductStatus        @default(active)
   WarehouseInventory WarehouseInventory[]
   StockTransaction   StockTransaction[]
@@ -35,9 +38,9 @@ model Warehouse {
   name               String
   location           String
   status             WarehouseStatus      @default(active)
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  deletedAt          DateTime?
+  created_at         DateTime             @default(now())
+  updated_at         DateTime             @updatedAt
+  deleted_at         DateTime?
   WarehouseInventory WarehouseInventory[]
   StockTransaction   StockTransaction[]
 
@@ -46,33 +49,33 @@ model Warehouse {
 }
 
 model WarehouseInventory {
-  id          String    @id @default(uuid())
-  tenant_id   String
-  warehouseId String
-  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
-  productId   String
-  product     Product   @relation(fields: [productId], references: [id])
-  stock       Int
-  minStock    Int
-  capacity    Int
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id           String    @id @default(uuid())
+  tenant_id    String
+  warehouse_id String
+  warehouse    Warehouse @relation(fields: [warehouse_id], references: [id])
+  product_id   String
+  product      Product   @relation(fields: [product_id], references: [id])
+  stock        Int
+  min_stock    Int
+  capacity     Int
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
 
-  @@unique([warehouseId, productId])
+  @@unique([warehouse_id, product_id])
   @@map("warehouse_inventories")
 }
 
 model StockTransaction {
-  id          String          @id @default(uuid())
-  tenant_id   String
-  productId   String
-  product     Product         @relation(fields: [productId], references: [id])
-  warehouseId String
-  warehouse   Warehouse       @relation(fields: [warehouseId], references: [id])
-  quantity    Int
-  type        TransactionType
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  id           String          @id @default(uuid())
+  tenant_id    String
+  product_id   String
+  product      Product         @relation(fields: [product_id], references: [id])
+  warehouse_id String
+  warehouse    Warehouse       @relation(fields: [warehouse_id], references: [id])
+  quantity     Int
+  type         TransactionType
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
 
   @@map("stock_transactions")
 }

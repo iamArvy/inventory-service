@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TransactionType } from '@prisma/client';
 import { Expose } from 'class-transformer';
+import { TransactionType } from 'src/generated/prisma/enums';
 import { ProductDto } from 'src/modules/product/dto';
 import { WarehouseDto } from 'src/modules/warehouse/dto';
 

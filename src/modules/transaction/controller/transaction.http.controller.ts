@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -16,9 +24,11 @@ import {
   TransactionDto,
   TransactionQueryDto,
 } from '../dto';
+import { WarehouseContextGuard } from 'src/common/guards/warehouse.guard';
 
+@UseGuards(WarehouseContextGuard)
 @ApiSecurity('tenant-key')
-@Controller('warehouses/:warehouseId/products/:productId/transactions')
+@Controller('inventory/:productId/transactions')
 export class TransactionController {
   constructor(private readonly service: TransactionService) {}
 

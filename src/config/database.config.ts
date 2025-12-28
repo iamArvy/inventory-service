@@ -2,7 +2,7 @@ import { registerAs } from '@nestjs/config';
 import * as Joi from 'joi';
 
 export const dbConfig = registerAs('db', () => ({
-  url: process.env.DATABASE_URL,
+  connectionString: process.env.DATABASE_URL,
   // host: process.env.DB_HOST,
   // port: Number(process.env.DB_PORT) || 5432,
   // user: process.env.DB_USER,

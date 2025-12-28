@@ -9,7 +9,7 @@ export class InventoryListener {
   constructor(private readonly service: InventoryService) {}
   @OnEvent(EventKeys.TRANSACTION_CREATED)
   async handleTransactionCreated(payload: TransactionCreatedEvent) {
-    const { warehouseId, productId, quantity, type } = payload;
-    await this.service.updateStock(warehouseId, productId, type, quantity);
+    const { warehouse_id, product_id, quantity, type } = payload;
+    await this.service.updateStock(warehouse_id, product_id, type, quantity);
   }
 }

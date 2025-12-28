@@ -4,7 +4,7 @@ import { IsInt, IsUUID } from 'class-validator';
 export class CreateInventoryDto {
   @IsUUID()
   @ApiProperty()
-  productId: string;
+  product_id: string;
 
   @IsInt()
   @ApiProperty()

@@ -1,7 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-import { WarehouseStatus } from '@prisma/client';
 import { IsEnum, IsString } from 'class-validator';
+import { WarehouseStatus } from 'src/generated/prisma/enums';
 
 export class UpdateWarehouseDto {
   @IsString()

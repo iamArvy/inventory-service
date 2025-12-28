@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { InventoryService } from '../service';
 import {
@@ -16,17 +17,19 @@ import {
   PatchInventoryDto,
   UpdateInventoryDto,
 } from '../dto';
-import { ApiSecurity } from '@nestjs/swagger';
 import { INVENTORY_CONTROLLER, INVENTORY_ENDPOINTS } from '../constants';
 import {
   CreateInventoryDocs,
   GetInventoryDocs,
+  InventoryControllerDocs,
   ListInventoryDocs,
   PatchInventoryDocs,
   UpdateInventoryDocs,
 } from '../docs';
+import { WarehouseContextGuard } from 'src/common/guards/warehouse.guard';
 
-@ApiSecurity('tenant-key')
+@UseGuards(WarehouseContextGuard)
+@InventoryControllerDocs()
 @Controller(INVENTORY_CONTROLLER.basePath)
 export class InventoryController {
   constructor(private readonly service: InventoryService) {}

@@ -12,102 +12,58 @@ import {
 import { ProductService } from '../service';
 import {
   CreateProductDto,
-  PaginatedProductDto,
   PatchProductDto,
-  ProductDto,
   ProductQueryDto,
   UpdateProductDto,
 } from '../dto';
 import {
-  ApiBadRequestResponse,
-  ApiBody,
-  ApiConflictResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiSecurity,
-} from '@nestjs/swagger';
+  CreateProductDocs,
+  GetProductDocs,
+  ListProductDocs,
+  PatchProductDocs,
+  ProductControllerDocs,
+  UpdateProductDocs,
+} from '../docs';
+import { PRODUCT_CONTROLLER, PRODUCT_ENDPOINTS } from '../constants';
+import { DeleteProductDocs } from '../docs/delete.docs';
 
-@ApiSecurity('tenant-key')
-@Controller('products')
+@ProductControllerDocs()
+@Controller(PRODUCT_CONTROLLER.basePath)
 export class ProductController {
   constructor(private readonly service: ProductService) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create a new product' })
-  @ApiBody({ type: CreateProductDto })
-  @ApiOkResponse({
-    description: 'Product created successfully',
-    type: ProductDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'Invalid input or missing required fields',
-  })
-  @ApiBadRequestResponse({
-    description: 'Product with sku exists',
-  })
-  @ApiConflictResponse({ description: 'Product with sku exists' })
+  @CreateProductDocs()
+  @Post(PRODUCT_ENDPOINTS.CREATE.path)
   create(@Body() data: CreateProductDto) {
     return this.service.create(data);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get product by ID' })
-  @ApiParam({ name: 'id', type: String, description: 'Product ID' })
-  @ApiOkResponse({
-    description: 'Product retrieved successfully',
-    type: ProductDto,
-  })
-  @ApiNotFoundResponse({ description: 'Product not found' })
+  @GetProductDocs()
+  @Get(PRODUCT_ENDPOINTS.GET.path)
   get(@Param('id') id: string) {
     return this.service.get(id);
   }
 
-  @Get()
-  @ApiOperation({ summary: 'List all products with optional filters' })
-  @ApiQuery({ type: ProductQueryDto, required: false })
-  @ApiOkResponse({
-    description: 'List of products retrieved successfully',
-    type: PaginatedProductDto,
-  })
+  @ListProductDocs()
+  @Get(PRODUCT_ENDPOINTS.LIST.path)
   list(@Query() query: ProductQueryDto) {
     return this.service.list(query);
   }
 
-  @Put(':id')
-  @ApiOperation({ summary: 'Update a product (replace entire record)' })
-  @ApiParam({ name: 'id', type: String, description: 'Product ID' })
-  @ApiBody({ type: UpdateProductDto })
-  @ApiOkResponse({ description: 'Product updated successfully' })
-  @ApiNotFoundResponse({ description: 'Product not found' })
-  @ApiBadRequestResponse({
-    description: 'Product with sku exists',
-  })
+  @UpdateProductDocs()
+  @Put(PRODUCT_ENDPOINTS.UPDATE.path)
   update(@Param('id') id: string, @Body() data: UpdateProductDto) {
     return this.service.update(id, data);
   }
 
-  @Patch(':id')
-  @ApiOperation({ summary: 'Partially update a product' })
-  @ApiParam({ name: 'id', type: String, description: 'Product ID' })
-  @ApiBody({ type: PatchProductDto })
-  @ApiOkResponse({ description: 'Product patched successfully' })
-  @ApiNotFoundResponse({ description: 'Product not found' })
-  @ApiBadRequestResponse({
-    description: 'Product with sku exists',
-  })
+  @PatchProductDocs()
+  @Patch(PRODUCT_ENDPOINTS.PATCH.path)
   patch(@Param('id') id: string, @Body() data: PatchProductDto) {
     return this.service.update(id, data);
   }
 
-  @Delete(':id')
-  @ApiOperation({ summary: 'Delete a product by ID' })
-  @ApiParam({ name: 'id', type: String, description: 'Product ID' })
-  @ApiOkResponse({ description: 'Product deleted successfully' })
-  @ApiNotFoundResponse({ description: 'Product not found' })
-  @ApiBadRequestResponse({ description: 'Product already deleted' })
+  @DeleteProductDocs()
+  @Delete(PRODUCT_ENDPOINTS.DELETE.path)
   delete(@Param('id') id: string) {
     return this.service.delete(id);
   }

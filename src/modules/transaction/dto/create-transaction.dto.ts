@@ -1,15 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TransactionType } from '@prisma/client';
 import { IsEnum, IsInt, IsUUID } from 'class-validator';
+import { TransactionType } from 'src/generated/prisma/enums';
 
 export class CreateTransactionDto {
   @IsUUID()
   @ApiProperty()
-  warehouseId: string;
+  warehouse_id: string;
 
   @IsUUID()
   @ApiProperty()
-  productId: string;
+  product_id: string;
 
   @IsInt()
   @ApiProperty()
